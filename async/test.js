@@ -54,7 +54,7 @@ describe('async', function() {
     });
   });
 
-  describe('has a parallel method that', function() {
+  xdescribe('has a parallel method that', function() {
     it('runs functions in parallel', function(done) {
       var fun1 = function(cb) {
         setTimeout(cb.bind(null, null, 'test'), 10);
@@ -71,7 +71,7 @@ describe('async', function() {
     });
   });
 
-  describe('has a race method that', function() {
+  xdescribe('has a race method that', function() {
     it('uses the first completing function', function(done) {
       var fun1 = function(ms) {
         return function(cb) {
