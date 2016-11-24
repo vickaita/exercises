@@ -11,10 +11,13 @@ describe('async', function() {
       var fun2 = function(cb, data) {
         setTimeout(cb.bind(null, null, data + 'ing'), 10);
       };
+      var fun3 = function(cb, data) {
+          setTimeout(cb.bind(null, null, data + 'xyz'), 10);
+      }
 
       // returns a thunk
-      async.sequence([fun1, fun2])(function(err, data) {
-        assert.equal(data, 'testing');
+      async.sequence([fun1, fun2, fun3])(function(err, data) {
+        assert.equal(data, 'testingxyz');
         done();
       });
     });
