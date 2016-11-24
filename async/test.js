@@ -22,6 +22,23 @@ describe('async', function() {
       });
     });
 
+    it('short circuits when there is an error', function(done) {
+      var fun1 = function(cb) {
+        fun1.invoked = true;
+        setTimeout(cb.bind(null, 'ERROR', null), 10);
+      };
+      var fun2 = function(cb, data) {
+        fun2.invoked = true;
+        setTimeout(cb.bind(null, null, data + 'ing'), 10);
+      };
+      async.sequence([fun1, fun2])(function(err, data) {
+        assert.equal(err, 'ERROR')
+        assert(fun1.invoked);
+        assert(!fun2.invoked);
+        done();
+      });
+    });
+
     it('correctly handles sync functions in sequence', function(done) {
       var fun1 = function(cb) {
         cb(null, 'test1');
