@@ -91,7 +91,7 @@ describe('async', function() {
     });
   });
 
-  xdescribe('has a race method that', function() {
+  describe('has a race method that', function() {
     it('uses the first completing function', function(done) {
       var fun1 = function(ms) {
         return function(cb) {

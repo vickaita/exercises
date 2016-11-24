@@ -36,5 +36,20 @@ module.exports = {
     },
 
     race: function (funcs) {
+        return function(callback) {
+            let finished = false;
+            funcs.forEach(fn => {
+                fn((err, data) => {
+                    if (!err) {
+                        if (!finished) {
+                            finished = true;
+                            callback(null, data);
+                        }
+                    } else {
+                        callback(err, null);
+                    }
+                });
+            });
+        };
     }
 };
