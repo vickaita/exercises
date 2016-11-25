@@ -1,7 +1,9 @@
-module.exports = function update(oldState, commands) {
-    // $apply works on any value
+function update(oldState, commands) {
     if ('$apply' in commands) {
         return commands['$apply'](oldState);
+    }
+    if ('$set' in commands) {
+        return commands['$set'];
     }
 
     // Otherwise operate on the correct type
@@ -10,7 +12,7 @@ module.exports = function update(oldState, commands) {
     } else if (typeof oldState === 'object') {
         return updateObject(oldState, commands);
     } else {
-        // TODO
+        throw new Error('Unsupported operation');
     }
 };
 
@@ -35,4 +37,30 @@ function updateArray(oldState, commands) {
 }
 
 function updateObject(oldState, commands) {
+    if ('$set' in commands) {
+        return update(oldState, commands);
+    }
+
+    const newState = {};
+
+    if ('$merge' in commands) {
+        Object.keys(commands['$merge']).forEach(key => {
+            newState[key] = commands['$merge'][key];
+        });
+    } else {
+        Object.keys(commands).forEach(key => {
+            newState[key] = update(oldState[key], commands[key]);
+        });
+    }
+
+    // Copy unchaged branches
+    Object.keys(oldState).forEach(key => {
+        if (!(key in newState)) {
+            newState[key] = oldState[key];
+        }
+    });
+
+    return newState;
 }
+
+module.exports = update;
