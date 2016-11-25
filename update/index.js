@@ -5,15 +5,10 @@ function update(oldState, commands) {
     if ('$set' in commands) {
         return commands['$set'];
     }
-
-    // Otherwise operate on the correct type
-    if (Array.isArray(oldState)) {
+    if ('$push' in commands || '$splice' in commands || '$unshift' in commands) {
         return updateArray(oldState, commands);
-    } else if (typeof oldState === 'object') {
-        return updateObject(oldState, commands);
-    } else {
-        throw new Error('Unsupported operation');
     }
+    return updateObject(oldState, commands);
 };
 
 function updateArray(oldState, commands) {
@@ -37,20 +32,13 @@ function updateArray(oldState, commands) {
 }
 
 function updateObject(oldState, commands) {
-    if ('$set' in commands) {
-        return update(oldState, commands);
-    }
-
     const newState = {};
 
     if ('$merge' in commands) {
-        Object.keys(commands['$merge']).forEach(key => {
-            newState[key] = commands['$merge'][key];
-        });
+        const mergeObj = commands['$merge'];
+        Object.keys(mergeObj).forEach(key => newState[key] = mergeObj[key]);
     } else {
-        Object.keys(commands).forEach(key => {
-            newState[key] = update(oldState[key], commands[key]);
-        });
+        Object.keys(commands).forEach(key => newState[key] = update(oldState[key], commands[key]));
     }
 
     // Copy unchaged branches
