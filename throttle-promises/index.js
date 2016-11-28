@@ -1,15 +1,23 @@
 module.exports = function throttlePromises(n, arr) {
     return new Promise((resolve, reject) => {
-        processNextBatch([], arr.concat());
-        function processNextBatch(acc, batches) {
-            const batch = batches.splice(0, n);
-            if (batch.length) {
-                Promise.all(batch.map(fn => fn())).then((res) => {
-                    processNextBatch(acc.concat(res), batches);
-                });
-            } else {
-                resolve(acc);
-            }
+        let pool = arr.concat();
+        let next = 0;
+        let completed = 0;
+        let results = [];
+        for (let i = 0; i < n; i++) {
+            process(i);
+        }
+        function process(index) {
+            next++;
+            pool[index]().then(r => {
+                results[index] = r;
+                completed++;
+                if (next < pool.length) {
+                    process(next)
+                } else if (completed === pool.length) {
+                    resolve(results);
+                }
+            });
         }
     });
 };
