@@ -1,8 +1,8 @@
-const DOT = {toggle: true, duration: 1};
-const DASH = {toggle: true, duration: 3};
-const BETWEEN_DOTS = {toggle: false, duration: 1};
-const BETWEEN_LETTERS = {toggle: false, duration: 3};
-const BETWEEN_WORDS = {toggle: false, duration: 7};
+const DOT = 1;
+const DASH = 3;
+const BETWEEN_DOTS = 1;
+const BETWEEN_LETTERS = 3;
+const BETWEEN_WORDS = 7;
 
 module.exports = function transmitter({codes, message, toggle, timeouter}, callback) {
     const encoded = [];
@@ -24,15 +24,12 @@ module.exports = function transmitter({codes, message, toggle, timeouter}, callb
             });
         }
     });
-    function transmit(ops) {
-        if (!ops.length) {
+    function transmit(timings) {
+        toggle();
+        if (!timings.length) {
             callback();
         } else {
-            const op = ops[0];
-            if (op.toggle) {
-                toggle();
-            }
-            timeouter(() => transmit(ops.slice(1)), op);
+            timeouter(() => transmit(timings.slice(1)), timings[0]);
         }
     }
     transmit(encoded);
