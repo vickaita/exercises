@@ -24,5 +24,16 @@ module.exports = function transmitter({codes, message, toggle, timeouter}, callb
             });
         }
     });
-    console.log(encoded);
+    function transmit(ops) {
+        if (!ops.length) {
+            callback();
+        } else {
+            const op = ops[0];
+            if (op.toggle) {
+                toggle();
+            }
+            timeouter(() => transmit(ops.slice(1)), op);
+        }
+    }
+    transmit(encoded);
 };
